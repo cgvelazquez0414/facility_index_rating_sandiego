@@ -1,0 +1,84 @@
+#using python, and sqlite, in pycharm to clean data
+
+#import pandas to manipulate data
+import pandas as pd
+
+#uding pd.read_csv while finding path to read data
+fir = pd.read_csv('/Users/carlosvelazquez/Downloads/facility_index_rating_city_bldgs_1.csv')
+
+#conform dataset imported
+print(fir)
+
+#using tabulate to show in grid form
+from tabulate import tabulate
+
+#confirm grid form, only show first 5
+print(tabulate(fir.head(), headers='keys', tablefmt='grid'))
+
+#only show columns
+print(fir.columns)
+
+#select columns i want
+selected_cols = ['building_name', 'building_number',
+          'community_area', 'lat', 'lng',
+          'condition', 'fci', 'year_built', 'building_function', 'gross_sq_ft', 'desc_full']
+
+#make new dataset with columns I want
+my_fir = fir[selected_cols]
+print(my_fir)
+
+#use sqlite to make a database
+import sqlite3
+
+conn = sqlite3.connect('my_fir_db.sqlite')
+
+my_fir.to_sql('facility_index_rating', conn, if_exists='replace', index=False)
+
+conn.close()
+
+#import new dataset
+not_good_blds_df = pd.read_csv('/Users/carlosvelazquez/Desktop/facility_index_rating/not_good_bldgs.csv')
+
+#count all NA's
+total_nas = not_good_blds_df.isna().sum()
+print(total_nas)
+
+#removing rows with NA
+not_good_bldgs_1 = not_good_blds_df.dropna(subset=['building_name', 'lat', 'lng'])
+total_nas_1 = not_good_bldgs_1.isna().sum()
+print(total_nas_1)
+
+print(not_good_bldgs_1)
+
+#seeing missing na in community_area and manually input
+na_index = not_good_blds_df['community_area'].isna().idxmax()
+print(na_index)
+
+not_good_bldgs_1.at[12, 'community_area'] = "Barrio Logan"
+
+total_nas_1 = not_good_bldgs_1.isna().sum()
+print(total_nas_1)
+
+#manually input sport facility into an NA cell
+na_index = not_good_blds_df['building_function'].isna().idxmax()
+print(na_index)
+
+not_good_bldgs_1.at[418, 'building_function'] = "Sport Facility"
+
+total_nas_1 = not_good_bldgs_1.isna().sum()
+print(total_nas_1)
+
+#removing missing description
+not_good_bldgs_2 = not_good_bldgs_1.dropna(subset=['desc_full'])
+total_nas_2 = not_good_bldgs_2.isna().sum()
+print(total_nas_2)
+
+print(not_good_bldgs_2)
+
+#make final table for sqlite used for export
+
+conn = sqlite3.connect('not_good_bldgs_2.sqlite')
+
+not_good_bldgs_2.to_sql('fir_ready_export', conn, if_exists='replace', index=False)
+
+conn.close()
