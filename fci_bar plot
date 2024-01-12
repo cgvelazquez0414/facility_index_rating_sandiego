@@ -1,0 +1,28 @@
+import pandas as pd
+import matplotlib.pyplot as viz
+
+#read dataset
+fci_visual = pd.read_csv('/Users/carlosvelazquez/Desktop/facility_index_rating/not_good_blds_ready_exp.csv')
+print(fci_visual)
+
+#creating bar chart
+print(fci_visual.columns)
+
+#group building functions
+bldg_fx = fci_visual.groupby('building function').size()
+
+#create new dataset for bar chart
+bldg_fx_df = bldg_fx.reset_index(name='Count')
+
+#make dataset into desc order
+bldg_fx_df_desc = bldg_fx_df.sort_values(by='Count', ascending=False)
+print(bldg_fx_df_desc)
+
+bldg_fx_df_desc.plot(kind='bar', x='building function')
+viz.title('Types of Buildings with Poor and Fair FCI')
+viz.ylabel('Amount')
+viz.xlabel('Types of Buildings')
+viz.xticks(rotation=45)
+viz.xticks(rotation=90, ha='center', fontsize = 6)
+viz.tight_layout()
+viz.show()
