@@ -1,0 +1,34 @@
+import pandas as pd
+import matplotlib.pyplot as viz_2
+from scipy.stats import linregress
+import statsmodels.api as sm
+from scipy import stats
+
+
+
+fci_visual_sqft_score = pd.read_csv('/Users/carlosvelazquez/Desktop/facility_index_rating/not_good_blds_ready_exp.csv')
+print(fci_visual_sqft_score)
+
+print(fci_visual_sqft_score.columns)
+
+#newdataset only containings score and sqft
+score_sqft = fci_visual_sqft_score[['fci','gross_sq_ft']]
+print(score_sqft)
+
+#scatter plot of fci v sqft
+viz_2.scatter(score_sqft['fci'], score_sqft['gross_sq_ft'])
+viz_2.xlabel('FCI')
+viz_2.ylabel('Gross Square Feet')
+viz_2.title('FCI vs Gross Square Feet')
+
+#plot regression line
+slope, intercept, r_value, p_value, std_err = linregress(score_sqft['fci'], score_sqft['gross_sq_ft'])
+viz_2.plot(score_sqft['fci'], intercept + slope * score_sqft['fci'], 'r')
+viz_2.tight_layout()
+viz_2.text(75, 25000, f'y = {intercept:.2f} + {slope:.2f}x\nR-squared = {r_value**2:.2f}', fontsize=10, color='blue')
+viz_2.show()
+
+#correlation
+correl_fci_sqft, p_value = stats.pearsonr(score_sqft['fci'], score_sqft['gross_sq_ft'])
+print(correl_fci_sqft)
+#08041807124725225
